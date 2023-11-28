@@ -8,7 +8,9 @@ import imutils
 import dlib
 import cv2
 import pandas as pd
-import playsound
+from pydub import AudioSegment
+from pydub.playback import play
+
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--prototxt", required=True,help="path to Caffe prototxt file")
@@ -39,11 +41,12 @@ HeightOfVideo = None
 
 csvData = []
 fields = ["Time","Count"]
-df2 = pd.read_csv("Inputs\CardInputs.csv", usecols = ['Card Entry'])
+df2 = pd.read_csv("./Inputs/CardInputs.csv", usecols = ['Card Entry'])
 
 CentroidTracker = CentroidTrackingAlgorithm(MaxFramesAfterDisappeared=40, MaxDistance=50)
 trackers = []
 trackableObjects = {}
+sound = AudioSegment.from_file("./Inputs/beep-03.mp3")
 
 
 totalFrames = 0
@@ -114,7 +117,8 @@ while True:
             if (TotalTimeElapsed - 1 >= 0) and ((df2['Card Entry'][TotalTimeElapsed - 1]) and (EntriesPerSec > df2['Card Entry'][TotalTimeElapsed - 1])):
                 print("ALERT TAILGATING AT ",TotalTimeElapsed - 1)
                 TotalTailgates += 1
-                playsound.playsound('Inputs\\beep-03.mp3')
+                # playsound.playsound('./Inputs/beep-03.mp3')
+                play(sound)
                 EntriesPerSec = 0
         except KeyError:
             print("No input for card entry for time = ",TotalTimeElapsed)
@@ -153,7 +157,8 @@ while True:
                     EntriesPerSec += 1
                     if not df2['Card Entry'][TotalTimeElapsed]:
                         print("ALERT TAILGATING at ",TotalTimeElapsed)
-                        playsound.playsound('Inputs\\beep-03.mp3')
+                        # playsound.playsound('./Inputs/beep-03.mp3')
+                        play(sound)
                         TotalTailgates += 1
                     to.counted = True
         trackableObjects[objectID] = to
@@ -201,24 +206,24 @@ csvData = [list(x) for x in set(tuple(x) for x in csvData)]
 csvData.sort()
 CsvDataFrame = pd.DataFrame(csvData,columns=fields)
 CsvDataFrame = CsvDataFrame.drop_duplicates(subset='Time', keep="last")
-CsvDataFrame.to_csv('Outputs\\temp.csv',index=False,header=fields)
+CsvDataFrame.to_csv('./Outputs/temp.csv',index=False,header=fields)
 
 
 listdf2 = df2.values.tolist()
 df2col = [i for j in listdf2 for i in j]
-df = pd.read_csv("Outputs\\temp.csv")
+df = pd.read_csv("./Outputs/temp.csv")
 if(len(df.index) == len(df2.index)):
     df['Card Values'] = df2col
     fields.append("Card Values")
-    df.to_csv('Outputs\\Log.csv',index=False,header=fields)
+    df.to_csv('./Outputs/Log.csv',index=False,header=fields)
 elif(len(df.index) < len(df2.index)):
     print("More card inputs than inputs in video.....\nUsing only part of card inputs")
     df2col = df2col[0:len(df.index)]
     df['Card Values'] = df2col
     fields.append("Card Values")
-    df.to_csv('Outputs\\Log.csv',index=False,header=fields)
+    df.to_csv('./Outputs/Log.csv',index=False,header=fields)
 else:
     print("lesser card inputs than inputs in video.....\nWill use NaN values")
     df = pd.concat([df,df2], ignore_index=True, axis=1)
     fields.append("Card Values")
-    df.to_csv('Outputs\\Log.csv',index=False,header=fields)
+    df.to_csv('./Outputs/Log.csv',index=False,header=fields)
