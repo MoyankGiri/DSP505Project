@@ -77,3 +77,8 @@ Tailgates are only defined on people who are going out of the restricted area, t
 ![Tailgating Output](/Assets/TGOutput1.png "Tailgating Process")
 
 Output are as shown in video and an alerting beep which will play when a tailgate is detected.
+
+## Contribution
+The entire project is a joint contribution of both contributors namely
+1. Moyank Giri, 12310830
+2. Tanmoy Bhowmick, 12311110
