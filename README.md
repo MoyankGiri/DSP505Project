@@ -28,7 +28,8 @@ then once activated, run the commmand
 ```bash
 python3 apptk.py
 ```
-to run the application
+to run the windows application created using Tkinter. Add the necessary inputs and click run.<br>
+This will create another window over the inputs
 
 ## Implementation
 The complete process can be divided into three phases namely:
